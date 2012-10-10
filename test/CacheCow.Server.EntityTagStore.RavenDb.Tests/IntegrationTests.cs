@@ -146,7 +146,7 @@ namespace CacheCow.Server.EntityTagStore.RavenDb.Tests
 		}
 
 		[Test]
-		//[Ignore]
+		[Ignore]
 		public void ClearCache() {
 			var cacheKey = new CacheKey("/api/Cars", new[] { "1234", "abcdef" });
 			var cacheKey2 = new CacheKey("/api/Cars", new[] { "1234", "abcdefgh" });
