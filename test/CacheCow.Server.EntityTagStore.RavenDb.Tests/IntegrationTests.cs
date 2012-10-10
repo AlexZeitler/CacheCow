@@ -22,15 +22,16 @@ namespace CacheCow.Server.EntityTagStore.RavenDb.Tests
 		[Ignore]
 		public void AddTest()
 		{
-			var cacheKey = new CacheKey("/api/Cars", new[] {"1234", "abcdef"});
-			var documentStore = new EmbeddableDocumentStore() {
+			var cacheKey = new CacheKey("/api/Cars", new[] { "1234", "abcdef" });
+			var documentStore = new EmbeddableDocumentStore()
+			{
 				RunInMemory = true
 			}.Initialize();
 
 			new RavenDocumentsByEntityName().Execute(documentStore);
-			
+
 			var store = new RavenDbEntityTagStore(documentStore);
-			var value = new TimedEntityTagHeaderValue("\"abcdef1234\"") {LastModified = DateTime.Now};
+			var value = new TimedEntityTagHeaderValue("\"abcdef1234\"") { LastModified = DateTime.Now };
 
 
 			// first remove them
@@ -54,10 +55,11 @@ namespace CacheCow.Server.EntityTagStore.RavenDb.Tests
 		public void UpdateTest()
 		{
 			var cacheKey = new CacheKey("/api/Cars", new[] { "1234", "abcdef" });
-			var documentStore = new EmbeddableDocumentStore() {
+			var documentStore = new EmbeddableDocumentStore()
+			{
 				RunInMemory = true
 			}.Initialize();
-			
+
 			var store = new RavenDbEntityTagStore(documentStore);
 			var value = new TimedEntityTagHeaderValue("\"abcdef1234\"") { LastModified = DateTime.Now };
 
@@ -93,7 +95,8 @@ namespace CacheCow.Server.EntityTagStore.RavenDb.Tests
 		public void RemoveByIdTest()
 		{
 			var cacheKey = new CacheKey("/api/Cars", new[] { "1234", "abcdef" });
-			var documentStore = new EmbeddableDocumentStore() {
+			var documentStore = new EmbeddableDocumentStore()
+			{
 				RunInMemory = true
 			}.Initialize();
 
@@ -120,10 +123,11 @@ namespace CacheCow.Server.EntityTagStore.RavenDb.Tests
 		{
 			var cacheKey = new CacheKey("/api/Cars", new[] { "1234", "abcdef" });
 			var cacheKey2 = new CacheKey("/api/Cars", new[] { "1234", "abcdefgh" });
-			var documentStore = new EmbeddableDocumentStore() {
+			var documentStore = new EmbeddableDocumentStore()
+			{
 				RunInMemory = true
 			}.Initialize();
-			
+
 			var store = new RavenDbEntityTagStore(documentStore);
 			var value = new TimedEntityTagHeaderValue("\"abcdef1234\"") { LastModified = DateTime.Now };
 
