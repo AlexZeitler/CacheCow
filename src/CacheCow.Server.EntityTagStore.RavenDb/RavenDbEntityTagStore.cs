@@ -4,9 +4,12 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using CacheCow.Common;
+using Raven.Abstractions.Data;
 using Raven.Client;
 using Raven.Client.Document;
+using Raven.Client.Indexes;
 
 namespace CacheCow.Server.EntityTagStore.RavenDb
 {
@@ -132,14 +135,12 @@ namespace CacheCow.Server.EntityTagStore.RavenDb
 
 		public void Clear()
 		{
-			using (var connection = new SqlConnection(_connectionSting))
-			using (var command = new SqlCommand())
-			{
-				connection.Open();
-				command.Connection = connection;
-				command.CommandText = "DELETE FROM db.CacheState;";
-				command.CommandType = CommandType.Text;
-				command.ExecuteNonQuery();
+			using(var session = _documentStore.OpenSession()) {
+				while (_documentStore.DatabaseCommands.GetStatistics().StaleIndexes.Length != 0) {
+					Thread.Sleep(10);
+				}
+				_documentStore.DatabaseCommands.DeleteByIndex("AllPersistentCacheKeys", new IndexQuery());
+				
 			}
 		}
 

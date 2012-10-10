@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using CacheCow.Common;
 using NUnit.Framework;
 using Raven.Client;
@@ -137,6 +138,42 @@ namespace CacheCow.Server.EntityTagStore.RavenDb.Tests
 			// delete
 			Assert.AreEqual(2, store.RemoveAllByRoutePattern("/api/Cars"));
 
+
+		}
+
+		[Test]
+		//[Ignore]
+		public void ClearCache() {
+			var cacheKey = new CacheKey("/api/Cars", new[] { "1234", "abcdef" });
+			var cacheKey2 = new CacheKey("/api/Cars", new[] { "1234", "abcdefgh" });
+			var documentStore = new EmbeddableDocumentStore() {
+				RunInMemory = true
+			}.Initialize();
+
+			documentStore.DatabaseCommands.PutIndex("AllPersistentCacheKeys", new IndexDefinitionBuilder<PersistentCacheKey, PersistentCacheKey> {
+				Map = persistentCacheKeys => from persistentCacheKey in persistentCacheKeys
+								select new { persistentCacheKey }
+			});
+
+			var store = new RavenDbEntityTagStore(documentStore);
+			var value = new TimedEntityTagHeaderValue("\"abcdef1234\"") { LastModified = DateTime.Now };
+
+
+			// first remove them
+			store.RemoveAllByRoutePattern(cacheKey.RoutePattern);
+
+			// add
+			store.AddOrUpdate(cacheKey, value);
+			store.AddOrUpdate(cacheKey2, value);
+
+			// delete
+			store.Clear();
+			TimedEntityTagHeaderValue dbValue;
+			TimedEntityTagHeaderValue dbValue2;
+			store.TryGetValue(cacheKey, out dbValue);
+			store.TryGetValue(cacheKey2, out dbValue2);
+			Assert.AreEqual(null, dbValue);
+			Assert.AreEqual(null, dbValue2);
 
 		}
 
